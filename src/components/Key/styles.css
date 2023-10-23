@@ -1,0 +1,10 @@
+.key {
+  background-color: gray;
+  cursor: pointer;
+  color: white;
+  font-size: 25px;
+}
+
+.key:hover {
+  background-color: blueviolet;
+}
