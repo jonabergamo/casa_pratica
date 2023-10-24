@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import Key from "./components/Key/Key";
 
 function App() {
   const [display, setDisplay] = useState("0");
+  const [history, setHistory] = useState([]);
 
   const handleKeyClick = (value) => {
     if (display === "0" && value !== ".") {
@@ -13,12 +14,34 @@ function App() {
     setDisplay((prevDisplay) => prevDisplay + value);
   };
 
+  const saveHistory = (newHistory) => {
+    localStorage.setItem("history", JSON.stringify(newHistory));
+  };
+
   const computeValues = () => {
     try {
-      setDisplay(eval(display).toString());
+      const operation = display;
+      const result = eval(display).toFixed(2).toString();
+      const newHistory = [...history, operation + "=" + result];
+      setDisplay(result);
+      setHistory(newHistory);
+      saveHistory(newHistory);
     } catch (error) {
       setDisplay("Erro");
     }
+  };
+
+  useEffect(() => {
+    const storagedLocal = localStorage.getItem("history");
+    const parsedLocal = JSON.parse(storagedLocal);
+    setHistory(parsedLocal);
+  }, []);
+
+  const handleDelete = (index) => {
+    let newHistory = history.slice();
+    newHistory.splice(index, 1);
+    setHistory(newHistory);
+    saveHistory(newHistory);
   };
 
   return (
@@ -51,6 +74,21 @@ function App() {
             }}
           />
         </div>
+      </div>
+      <div>
+        {history.map((value, index) => (
+          <div style={{ display: "flex", color: "white" }}>
+            <p>
+              {index + 1}. {value}
+            </p>
+            <button
+              onClick={() => {
+                handleDelete(index);
+              }}>
+              DELETE
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
